@@ -9,6 +9,9 @@ public class Inspector {
     	System.out.println("Class name: " + c.getName());
     	System.out.print("Super classes in order from highest parent to child class: ");
     	recurseSuperClass(c);
+    	System.out.println();
+    	getInterfaces(c);
+    	
     	Class[] list = c.getInterfaces();
     }
     
@@ -25,6 +28,38 @@ public class Inspector {
     	}
     	recurseSuperClass(c.getSuperclass());
     		System.out.print(c.getName() + ", ");
+    }
+    
+    public void getInterfaces(Class<?> c) {
+    	Class <?> [] interfaces = c.getInterfaces();
+    	System.out.print(c.getName() + " interfaces: ");
+    	for(Class <?> inter: interfaces) {
+    		System.out.print(inter.getName() + ", ");	
+    	}
+    	if(c.getSuperclass() != null) {
+    		getRecurseInterfaces(c);
+    	}
+    }
+    
+    public void getRecurseInterfaces(Class<?> c) {
+    	if(c.getSuperclass() != null) {
+    		c= c.getSuperclass();
+    		System.out.println();
+	    	Class <?> [] interfaces = c.getInterfaces();
+	    	if(interfaces.length > 0) {
+	    		System.out.print(c.getName() + " interfaces: ");
+		    	for(Class <?> inter: interfaces) {
+		    		System.out.println(inter.getName()+ ", ");	
+		    	}
+	    	}
+	    	if(c.getSuperclass() != null) {
+	    		getRecurseInterfaces(c);
+	    	}
+    	}
+    	else {
+    		return;
+    	}
+    	
     }
     
     
