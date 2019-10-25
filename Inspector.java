@@ -1,3 +1,7 @@
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 public class Inspector {
 
     public void inspect(Object obj, boolean recursive) {
@@ -11,6 +15,34 @@ public class Inspector {
     	recurseSuperClass(c);
     	System.out.println();
     	getInterfaces(c);
+    	getConstructors(c);
+    	
+    	
+    	Method [] methods = c.getDeclaredMethods();
+    	for(Method meth: methods) {
+    		System.out.println(meth.getName());
+    		Class<?>[] exceptions = meth.getExceptionTypes();
+    		for(Class <?> excep : exceptions) {
+    			System.out.println("\tHas exceptions: \n\t\t" +excep.getName());
+    		}
+    		Class<?>[] params = meth.getParameterTypes();
+    		for(Class <?> param : params) {
+    			System.out.println("\tHas parameters: \n\t\t"+ param.getName() );
+    		}
+    		System.out.println("\tThe return type is: " + meth.getReturnType());
+    		System.out.println("\tModifiers: " + meth.getModifiers());
+    	}
+    	
+    	if(recursive == false) {
+    		Field[] fields = c.getDeclaredFields();
+    		System.out.println("Fields: ");
+    		for(Field field : fields) {
+    			System.out.println("Name: " + field.getName());
+    			System.out.println("\tType: " +field.getType());
+    			System.out.println("\tModifier: " +field.getModifiers());
+    		}
+    	}
+    	
     	
     	Class[] list = c.getInterfaces();
     }
@@ -27,7 +59,11 @@ public class Inspector {
     		}
     	}
     	recurseSuperClass(c.getSuperclass());
-    		System.out.print(c.getName() + ", ");
+    		System.out.println(c.getName() + ", ");
+    }
+    
+    public void tabs() {
+    	
     }
     
     public void getInterfaces(Class<?> c) {
@@ -62,11 +98,30 @@ public class Inspector {
     	
     }
     
+    public void getConstructors(Class<?> c) {
+    	Constructor<?>[] constructors = c.getConstructors();
+    	for(Constructor<?> con: constructors) {
+    		System.out.println("Constructor Name: " + con.getName());
+    		Class<?>[] parameters = con.getParameterTypes();
+    		if(parameters.length > 0) {
+	    		System.out.println("Parameters: ");   
+	    		for(Class<?> para : parameters) {
+	    			System.out.println("\t" + para.getName());    			
+	    		}
+    		}
+    		else {
+    			System.out.println("Constructor has no parameters");
+    			
+    		}
+    		System.out.println("Modifiers: " + con.getModifiers());
+    	}
+    }
+    
     
     public static void main (String [] args) {
-    	ClassB a;
+    	ClassA a;
 		try {
-			a = new ClassB();
+			a = new ClassA();
 			Inspector inspec = new Inspector ();
 			inspec.inspect(a, false);
 		} catch (Exception e) {
