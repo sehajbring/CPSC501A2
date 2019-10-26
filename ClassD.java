@@ -19,5 +19,5 @@ public class ClassD {
     public int getVal3() {
         return val3;
     }
-
+    
 }

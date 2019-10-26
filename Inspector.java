@@ -1,8 +1,12 @@
+//import java.awt.List;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.*;
 
 public class Inspector {
+
+	int tabSpaces;
 
     public void inspect(Object obj, boolean recursive) {
         Class c = obj.getClass();
@@ -10,9 +14,9 @@ public class Inspector {
     }
 
     private void inspectClass(Class c, Object obj, boolean recursive, int depth) {
-    	System.out.println("Class name: " + c.getName());
-    	System.out.print("Super classes in order from highest parent to child class: ");
-    	recurseSuperClass(c);
+    	System.out.println("Original class name: " + c.getName());
+    	System.out.println("Super classes: ");
+    	recurseSuperClass(c.getSuperclass());
     	System.out.println();
     	getInterfaces(c);
     	getConstructors(c);
@@ -37,10 +41,21 @@ public class Inspector {
     		Field[] fields = c.getDeclaredFields();
     		System.out.println("Fields: ");
     		for(Field field : fields) {
+    			field.setAccessible(true);
     			System.out.println("Name: " + field.getName());
     			System.out.println("\tType: " +field.getType());
     			System.out.println("\tModifier: " +field.getModifiers());
+    			try {
+					System.out.println("\tCurrent value: " + field.get(obj));
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
     		}
+    	}
+    	else {
+    		List<Field> fl = new ArrayList<Field>();
+    		
     	}
     	
     	
@@ -48,44 +63,43 @@ public class Inspector {
     }
     
     public void recurseSuperClass(Class<?> c) {
-		
     	if(c.getSuperclass() == null) {
     		if(c.getName().equals("java.lang.Object")) {
     			return;
     		}
     		else {
-    			System.out.print (c.getName() + ", ");
     			return;
     		}
     	}
+    	tabSpaces++;
+    	System.out.println("\t" + c.getName());
     	recurseSuperClass(c.getSuperclass());
-    		System.out.println(c.getName() + ", ");
+
     }
     
-    public void tabs() {
-    	
-    }
-    
+
     public void getInterfaces(Class<?> c) {
     	Class <?> [] interfaces = c.getInterfaces();
     	System.out.print(c.getName() + " interfaces: ");
     	for(Class <?> inter: interfaces) {
-    		System.out.print(inter.getName() + ", ");	
+    		System.out.print(inter.getName());	
     	}
     	if(c.getSuperclass() != null) {
     		getRecurseInterfaces(c);
     	}
     }
     
+    
     public void getRecurseInterfaces(Class<?> c) {
     	if(c.getSuperclass() != null) {
+    		
     		c= c.getSuperclass();
-    		System.out.println();
 	    	Class <?> [] interfaces = c.getInterfaces();
+	    	System.out.println();
 	    	if(interfaces.length > 0) {
 	    		System.out.print(c.getName() + " interfaces: ");
 		    	for(Class <?> inter: interfaces) {
-		    		System.out.println(inter.getName()+ ", ");	
+		    		System.out.println(inter.getName());	
 		    	}
 	    	}
 	    	if(c.getSuperclass() != null) {
@@ -95,9 +109,10 @@ public class Inspector {
     	else {
     		return;
     	}
-    	
+
     }
-    
+   
+   
     public void getConstructors(Class<?> c) {
     	Constructor<?>[] constructors = c.getConstructors();
     	for(Constructor<?> con: constructors) {
@@ -119,9 +134,9 @@ public class Inspector {
     
     
     public static void main (String [] args) {
-    	ClassA a;
+    	ClassB a;
 		try {
-			a = new ClassA();
+			a = new ClassB();
 			Inspector inspec = new Inspector ();
 			inspec.inspect(a, false);
 		} catch (Exception e) {
