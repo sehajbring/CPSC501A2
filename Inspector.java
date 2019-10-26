@@ -127,13 +127,7 @@ public class Inspector {
     
     public void recurseSuperClass(Class<?> c) {
     	if(c.getSuperclass() == null) {
-    		if(c.getName().equals("java.lang.Object")) {
-    			return;
-    		}
-    		else {
-    			
-    			return;
-    		}
+    		return;
     	}
     	tabSpaces++;
     	hm.put(c.getName(), tabSpaces);
@@ -203,9 +197,9 @@ public class Inspector {
     
     
     public static void main (String [] args) {
-    	ClassD a;
+    	ClassB a;
 		try {
-			a = new ClassD();
+			a = new ClassB();
 			Inspector inspec = new Inspector ();
 			inspec.inspect(a, false);
 		} catch (Exception e) {
