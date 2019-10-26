@@ -202,17 +202,5 @@ public class Inspector {
     }
     
     
-    public static void main (String [] args) {
-    	ClassB a;
-		try {
-			a = new ClassB();
-			Inspector inspec = new Inspector ();
-			inspec.inspect(a, false);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-    }
 
 }
