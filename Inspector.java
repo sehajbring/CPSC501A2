@@ -19,47 +19,77 @@ public class Inspector {
     	recurseSuperClass(c.getSuperclass());
     	System.out.println();
     	getInterfaces(c);
+    	System.out.println();
     	getConstructors(c);
-    	
-    	
+    	System.out.println();
+    	getMethods(c);
+    	recurseFields(c, recursive, obj);
+    }
+    
+    public void getMethods(Class<?> c) {
     	Method [] methods = c.getDeclaredMethods();
     	for(Method meth: methods) {
-    		System.out.println(meth.getName());
+    		System.out.println(c.getCanonicalName() + " method: " +meth.getName());
     		Class<?>[] exceptions = meth.getExceptionTypes();
     		for(Class <?> excep : exceptions) {
-    			System.out.println("\tHas exceptions: \n\t\t" +excep.getName());
+    			System.out.println(" Has exceptions: \n\t\t" +excep.getName());
     		}
     		Class<?>[] params = meth.getParameterTypes();
-    		for(Class <?> param : params) {
-    			System.out.println("\tHas parameters: \n\t\t"+ param.getName() );
+    		if(params.length > 0) {
+    			System.out.println(" Has parameters: ");
+	    		for(Class <?> param : params) {
+	    			System.out.println("  "+ param.getName() );
+	    		}
     		}
-    		System.out.println("\tThe return type is: " + meth.getReturnType());
-    		System.out.println("\tModifiers: " + meth.getModifiers());
-    	}
-    	
+    		else {
+    			System.out.println(" Contains no parameters");
+    		}
+    		System.out.println(" The return type is: " + meth.getReturnType());
+    		System.out.println(" Modifiers: " + meth.getModifiers());
+    		System.out.println();
+    	}	
+    }
+    
+    public void recurseFields(Class<?> c, boolean recursive, Object obj) {
     	if(recursive == false) {
+    		Field[] fields = c.getDeclaredFields();
+    		System.out.println(c.getName() +" fields: ");
+    		for(Field field : fields) {
+    			field.setAccessible(true);
+    			System.out.println(" Name: " + field.getName());
+    			System.out.println("  Type: " +field.getType());
+    			System.out.println("  Modifier: " +field.getModifiers());
+    			try {
+    				System.out.println("\tCurrent value: " + field.get(obj));
+    			} catch (IllegalArgumentException | IllegalAccessException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+    			System.out.println();
+    			
+    		}
+    	}
+    	else {
     		Field[] fields = c.getDeclaredFields();
     		System.out.println("Fields: ");
     		for(Field field : fields) {
     			field.setAccessible(true);
     			System.out.println("Name: " + field.getName());
     			System.out.println("\tType: " +field.getType());
+    			if(field.getType().isArray()) {
+    				
+    			}
     			System.out.println("\tModifier: " +field.getModifiers());
     			try {
-					System.out.println("\tCurrent value: " + field.get(obj));
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+    				System.out.println("\tCurrent value: " + field.get(obj));
+    			} catch (IllegalArgumentException | IllegalAccessException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
     		}
-    	}
-    	else {
-    		List<Field> fl = new ArrayList<Field>();
     		
     	}
     	
-    	
-    	Class[] list = c.getInterfaces();
     }
     
     public void recurseSuperClass(Class<?> c) {
@@ -99,7 +129,7 @@ public class Inspector {
 	    	if(interfaces.length > 0) {
 	    		System.out.print(c.getName() + " interfaces: ");
 		    	for(Class <?> inter: interfaces) {
-		    		System.out.println(inter.getName());	
+		    		System.out.println(inter.getName() + " ");	
 		    	}
 	    	}
 	    	if(c.getSuperclass() != null) {
@@ -119,16 +149,20 @@ public class Inspector {
     		System.out.println("Constructor Name: " + con.getName());
     		Class<?>[] parameters = con.getParameterTypes();
     		if(parameters.length > 0) {
-	    		System.out.println("Parameters: ");   
+	    		System.out.println(" Parameters: ");   
 	    		for(Class<?> para : parameters) {
-	    			System.out.println("\t" + para.getName());    			
+	    			System.out.println("\t" + para.getName());
+	    			if(para.getSuperclass() != null) {
+	    				recurseSuperClass(c);
+	    			}
 	    		}
     		}
     		else {
-    			System.out.println("Constructor has no parameters");
+    			System.out.println(" Constructor has no parameters");
     			
     		}
-    		System.out.println("Modifiers: " + con.getModifiers());
+    		System.out.println(" Modifiers: " + con.getModifiers());
+    		System.out.println();
     	}
     }
     
