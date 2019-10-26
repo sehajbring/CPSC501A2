@@ -3,10 +3,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.lang.System;
 
 public class Inspector {
 
 	int tabSpaces;
+	  Map<String,Integer> hm = new HashMap< String,Integer>();
 
     public void inspect(Object obj, boolean recursive) {
         Class c = obj.getClass();
@@ -15,6 +17,8 @@ public class Inspector {
 
     private void inspectClass(Class c, Object obj, boolean recursive, int depth) {
     	System.out.println("Original class name: " + c.getName());
+    	hm.put(c.getName(), 0);
+    	tabSpaces = 0;
     	System.out.println("Super classes: ");
     	recurseSuperClass(c.getSuperclass());
     	System.out.println();
@@ -24,6 +28,17 @@ public class Inspector {
     	System.out.println();
     	getMethods(c);
     	recurseFields(c, recursive, obj);
+    }
+    
+    public String placeTabs(String className) {
+    	int x = hm.get(className);
+    	String y = "\t";
+    	if (x > 0) {
+	    	for (int i = 1 ; i < x; i++) {
+	    		y = y.concat("\t");
+	    	}
+    	}
+    	return y;
     }
     
     public void getMethods(Class<?> c) {
@@ -59,11 +74,22 @@ public class Inspector {
     			System.out.println(" Name: " + field.getName());
     			System.out.println("  Type: " +field.getType());
     			System.out.println("  Modifier: " +field.getModifiers());
-    			try {
-    				System.out.println("\tCurrent value: " + field.get(obj));
-    			} catch (IllegalArgumentException | IllegalAccessException e) {
-    				// TODO Auto-generated catch block
-    				e.printStackTrace();
+    			if(field.getType().isArray()) {
+    				try {
+						System.out.println(" Object reference vaule: " + field.getType() + "@" + System.identityHashCode(field.get(obj)));
+						
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+    			}
+    			else {
+	    			try {
+	    				System.out.println("\tCurrent value: " + field.get(obj));
+	    			} catch (IllegalArgumentException | IllegalAccessException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			}
     			}
     			System.out.println();
     			
@@ -76,15 +102,22 @@ public class Inspector {
     			field.setAccessible(true);
     			System.out.println("Name: " + field.getName());
     			System.out.println("\tType: " +field.getType());
-    			if(field.getType().isArray()) {
-    				
-    			}
     			System.out.println("\tModifier: " +field.getModifiers());
-    			try {
-    				System.out.println("\tCurrent value: " + field.get(obj));
-    			} catch (IllegalArgumentException | IllegalAccessException e) {
-    				// TODO Auto-generated catch block
-    				e.printStackTrace();
+    			if(field.getType().isArray()) {
+    				try {
+    					System.out.println(" Object reference vaule: " + field.getType() + "@" + System.identityHashCode(field.get(obj)));
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+    			}
+    			else {
+	    			try {
+	    				System.out.println("\tCurrent value: " + field.get(obj));
+	    			} catch (IllegalArgumentException | IllegalAccessException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			}
     			}
     		}
     		
@@ -98,11 +131,13 @@ public class Inspector {
     			return;
     		}
     		else {
+    			
     			return;
     		}
     	}
     	tabSpaces++;
-    	System.out.println("\t" + c.getName());
+    	hm.put(c.getName(), tabSpaces);
+    	System.out.println(placeTabs(c.getName()) + c.getName());
     	recurseSuperClass(c.getSuperclass());
 
     }
@@ -168,9 +203,9 @@ public class Inspector {
     
     
     public static void main (String [] args) {
-    	ClassB a;
+    	ClassD a;
 		try {
-			a = new ClassB();
+			a = new ClassD();
 			Inspector inspec = new Inspector ();
 			inspec.inspect(a, false);
 		} catch (Exception e) {
