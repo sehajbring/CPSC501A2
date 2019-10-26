@@ -20,9 +20,9 @@ public class Inspector {
     	hm.put(c.getName(), 0);
     	tabSpaces = 0;
     	System.out.println("Super classes: ");
-    	recurseSuperClass(c.getSuperclass());
+    	findSuperClassesRecursivley(c.getSuperclass());
     	System.out.println();
-    	getInterfaces(c);
+    	findInterfacesForLowestLevelClass(c);
     	System.out.println();
     	getConstructors(c);
     	System.out.println();
@@ -67,33 +67,7 @@ public class Inspector {
     
     public void recurseFields(Class<?> c, boolean recursive, Object obj) {
     	if(recursive == false) {
-    		Field[] fields = c.getDeclaredFields();
-    		System.out.println(c.getName() +" fields: ");
-    		for(Field field : fields) {
-    			field.setAccessible(true);
-    			System.out.println(" Name: " + field.getName());
-    			System.out.println("  Type: " +field.getType());
-    			System.out.println("  Modifier: " +field.getModifiers());
-    			if(field.getType().isArray()) {
-    				try {
-						System.out.println(" Object reference vaule: " + field.getType() + "@" + System.identityHashCode(field.get(obj)));
-						
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-    			}
-    			else {
-	    			try {
-	    				System.out.println("\tCurrent value: " + field.get(obj));
-	    			} catch (IllegalArgumentException | IllegalAccessException e) {
-	    				// TODO Auto-generated catch block
-	    				e.printStackTrace();
-	    			}
-    			}
-    			System.out.println();
-    			
-    		}
+    		falseRecurseFields(c, recursive, obj);
     	}
     	else {
     		Field[] fields = c.getDeclaredFields();
@@ -125,19 +99,51 @@ public class Inspector {
     	
     }
     
-    public void recurseSuperClass(Class<?> c) {
+    public void falseRecurseFields(Class<?> c, boolean recursive, Object obj) {
+    	Field[] fields = c.getDeclaredFields();
+    	System.out.println(c.getName() +" fields: ");
+    	for(Field field : fields) {
+    		field.setAccessible(true);
+    		System.out.println(" Name: " + field.getName());
+    		System.out.println("  Type: " +field.getType());
+    		System.out.println("  Modifier: " +field.getModifiers());
+    		if(field.getType().isArray()) {
+    			try {
+    				System.out.println(" Object reference vaule: " + field.getType() + "@" + System.identityHashCode(field.get(obj)));
+    				
+    			} catch (IllegalArgumentException | IllegalAccessException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+    		}
+    		else {
+    			try {
+    				System.out.println("\tCurrent value: " + field.get(obj));
+    			} catch (IllegalArgumentException | IllegalAccessException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+    		}
+    		System.out.println();
+    		
+    	}
+    	
+    }
+    
+    
+    
+    public void findSuperClassesRecursivley(Class<?> c) {
     	if(c.getSuperclass() == null) {
     		return;
     	}
     	tabSpaces++;
     	hm.put(c.getName(), tabSpaces);
     	System.out.println(placeTabs(c.getName()) + c.getName());
-    	recurseSuperClass(c.getSuperclass());
-
+    	findSuperClassesRecursivley(c.getSuperclass());
     }
     
 
-    public void getInterfaces(Class<?> c) {
+    public void findInterfacesForLowestLevelClass(Class<?> c) {
     	Class <?> [] interfaces = c.getInterfaces();
     	System.out.print(c.getName() + " interfaces: ");
     	for(Class <?> inter: interfaces) {
@@ -182,7 +188,7 @@ public class Inspector {
 	    		for(Class<?> para : parameters) {
 	    			System.out.println("\t" + para.getName());
 	    			if(para.getSuperclass() != null) {
-	    				recurseSuperClass(c);
+	    				findSuperClassesRecursivley(c);
 	    			}
 	    		}
     		}
